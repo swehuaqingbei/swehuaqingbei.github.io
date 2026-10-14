@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#005b99">
+<title>华青杯华侨华人足球友谊赛</title>
+<meta name="description" content="华青杯华侨华人足球友谊赛 · 实时赛程、比分与积分榜">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Inter:wght@500;700;900&family=Oswald:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hd">
+  <span class="stripe"></span><span class="stripe s2"></span>
+  <div class="ttl">
+    <span class="seal">SOLLENTUNA</span>
+    <h1>华青杯华侨华人足球友谊赛</h1>
+  </div>
+  <div class="tabs" id="filters"></div>
+</header>
+
+<div class="status" id="status"></div>
+
+<main id="view"></main>
+
+<div class="demo" id="demo" hidden></div>
+
+<nav class="nav" id="nav">
+  <button data-page="matches"><b>⚽</b>赛程</button>
+  <button data-page="table"><b>📊</b>积分榜</button>
+  <button data-page="venue"><b>📍</b>场地</button>
+</nav>
+
+<canvas id="confetti"></canvas>
+
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
