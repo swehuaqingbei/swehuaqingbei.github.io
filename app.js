@@ -323,13 +323,14 @@
     const el = $('#status');
     const t = new Date(state.updatedAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const map = {
-      sheet: `<i></i>实时比分 · 每 ${Math.round(C.REFRESH_MS / 1000)} 秒自动刷新 · ${t}`,
+      sheet: '',
       offline: `<i></i>网络不稳定 · 显示的是 ${t} 的数据`,
       default: `<i></i>赛程预览（尚未连接比分表）`,
       demo: `<i></i>演示模式 · 数据为模拟`,
     };
     el.className = 'status' + (state.source === 'offline' ? ' off' : '');
     el.innerHTML = map[state.source];
+    el.hidden = !map[state.source];
   }
 
   function render() {
