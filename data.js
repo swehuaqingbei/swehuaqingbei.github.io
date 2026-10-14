@@ -18,8 +18,6 @@ window.DEFAULT_MATCHES = [
 
 // 当天流程中的非比赛节点
 window.EVENTS = [
-  { time: '12:30', title: '球队签到', note: '裁判及球队负责人赛前碰头' },
-  { time: '12:45', title: '合照 + 室外开幕式', note: '室外集合点，想参与合照请准时签到' },
   { time: '15:35', title: '小组赛结束 · 积分统计', note: '所有球队、儿童、家长集中到室内观看决赛' },
   { time: '17:10', title: '颁奖 + 全体合影', note: '室内球场' },
 ];
