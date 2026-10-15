@@ -62,6 +62,7 @@
       hp: num(o['主队积分']), ap: num(o['客队积分']),
       hpk: num(o['主队点球']), apk: num(o['客队点球']),
       winner: (o['胜方'] || '').trim(),
+      hcol: (o['主队颜色'] || o['主队球衣颜色'] || '').trim(), acol: (o['客队颜色'] || o['客队球衣颜色'] || '').trim(),
     };
     m.group = type.startsWith('A') ? 'A' : type.startsWith('B') ? 'B' : null;
     m.isFinal = type.includes('决赛');
@@ -74,14 +75,14 @@
 
   async function load() {
     if (DEMO) {
-      apply(window.DEMO_STEPS[state.demoStep].data, [], 'demo');
+      apply(window.DEMO_STEPS[state.demoStep].data, window.DEFAULT_TEAMS, 'demo');
       return;
     }
-    if (!C.SHEET_ID) { apply(window.DEFAULT_MATCHES, [], 'default'); return; }
+    if (!C.SHEET_ID) { apply(window.DEFAULT_MATCHES, window.DEFAULT_TEAMS, 'default'); return; }
     try {
       const [matches, ranks] = await Promise.all([
         fetchTab(C.MATCH_TAB),
-        fetchTab(C.RANK_TAB).catch(() => []),
+        fetchTab(C.RANK_TAB).catch(() => fetchTab('排名调整')).catch(() => window.DEFAULT_TEAMS),
       ]);
       if (!matches.length) throw new Error('empty');
       const now = Date.now();
@@ -92,7 +93,7 @@
       let cache = null;
       try { cache = JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (e) {}
       if (cache) apply(cache.matches, cache.ranks, 'offline', cache.at);
-      else apply(window.DEFAULT_MATCHES, [], 'offline');
+      else apply(window.DEFAULT_MATCHES, window.DEFAULT_TEAMS, 'offline');
     }
   }
 
@@ -153,21 +154,47 @@
   }
 
   // ---------------- rendering ----------------
-  const initial = name => { const s = String(name).trim(); return s ? s[0].toUpperCase() : '?'; };
-  const badge = name => `<span class="b">${esc(initial(name))}</span>`;
+  const initial = name => {
+    const s = String(name).trim();
+    const m = s.match(/^(.).*?([一二三四五六七八九\d])队$/);  // 索星一队 → 索一
+    if (m && s.length > 2) return m[1] + m[2];
+    return s ? s[0].toUpperCase() : '?';
+  };
+  const COLORS = {
+    红: '#d62e2e', 蓝: '#1f5fbf', 深蓝: '#12306b', 天蓝: '#3a9be0', 黄: '#f5c400', 白: '#ffffff', 黑: '#222831',
+    绿: '#1f9d55', 橙: '#f07c1b', 紫: '#7b3fbf', 灰: '#8a96a3', 粉: '#e85d9b', 金: '#d6a54a',
+  };
+  const LIGHT = ['#f5c400', '#ffffff', '#d6a54a'];
+  const colorOf = v => {
+    v = String(v || '').trim().replace(/色$/, '');
+    if (!v) return null;
+    if (/^#?[0-9a-f]{6}$/i.test(v)) return v[0] === '#' ? v : '#' + v;
+    return COLORS[v] || null;
+  };
+  const teamColor = name => {
+    const r = state.ranks.find(x => String(x['队伍'] || '').trim() === String(name).trim());
+    return r ? colorOf(r['默认颜色'] || r['球衣颜色'] || r['颜色']) : null;
+  };
+  const badge = (name, override) => {
+    const c = colorOf(override) || teamColor(name);
+    const st = c ? ` style="background:${c}"` : '';
+    const lt = c && LIGHT.includes(c.toLowerCase()) ? ' lt' : '';
+    return `<span class="b${lt}"${st}>${esc(initial(name))}</span>`;
+  };
 
   function teamHTML(m, side) {
     const name = side === 'h' ? m.home : m.away;
     if (!name) {
       const ph = m.isFinal ? (side === 'h' ? 'A组第一' : 'B组第一') : '待定';
-      return `<div class="team tbd"><span class="b q">?</span><span>${ph}</span></div>`;
+      return `<div class="team tbd"><span class="b q">?</span><span class="nm">${ph}</span></div>`;
     }
     let win = false;
     if (m.status === 'done') {
       if (m.group) win = side === 'h' ? m.hg > m.ag : m.ag > m.hg;
       else win = m.winner === name;
     }
-    return `<div class="team${win ? ' win' : ''}">${badge(name)}<span>${esc(name)}</span></div>`;
+    const col = side === 'h' ? m.hcol : m.acol;
+    return `<div class="team${win ? ' win' : ''}">${badge(name, col)}<span class="nm">${esc(name)}</span></div>`;
   }
 
   function scoreHTML(m) {
@@ -277,35 +304,38 @@
     return `
       <div class="code"><div><div class="k">室内球场 / 洗手间 门禁密码</div><div style="font-size:12px;margin-top:2px">进门后直走即是球场</div></div><div class="v">5026</div></div>
 
+      <div class="warn">⚠️ <b>本人 / 监护人签署安全责任告知书后方可参赛。</b><br>室内场地有其他球队训练，请勿大声喧哗或追跑打闹。</div>
+
       <div class="info"><h3>📍 怎么去</h3>
-        <p>Sollentuna Fotbollshall（Norrvikens IP），室外场与室内馆在同一处。场馆外有<b>付费停车场</b>。</p>
+        <p>Sollentuna Fotbollshall（Norrvikens IP），室外场与室内馆在同一处。场馆外有<b>付费停车场</b>；洗手间及室内球场门禁密码 <b>5026</b>，更衣室有淋浴供球员使用。</p>
+        <img src="assets/location-map.jpg" alt="场馆位置" loading="lazy">
         <div class="btns">
           <a class="btn" href="${g('Sollentuna Fotbollshall')}" target="_blank" rel="noopener">🗺 Google 地图</a>
           <a class="btn" href="${a('Sollentuna Fotbollshall')}" target="_blank" rel="noopener">🍎 Apple 地图</a>
         </div></div>
 
       <div class="info"><h3>☀️ 室外场 · 成人小组赛</h3>
-        <p>Norrvikens IP 室外场：<b>A组 → 11号场（1号场）</b>，<b>B组 → 12号场（2号场）</b>，均为半场。开幕式 12:45 在图中<b>集合点</b>举行。</p>
+        <p>Norrvikens IP 室外场：<b>A组 → 11号场（1号场）</b>，<b>B组 → 12号场（2号场）</b>，均为半场。</p>
         <img src="assets/outdoor-map.jpg" alt="室外场地示意图" loading="lazy"></div>
 
       <div class="info"><h3>🏟 室内馆 · 青少年组 & 决赛</h3>
-        <p>Sollentuna Fotbollshall 室内 <b>12号场</b>：青少年比赛（3号场）及 16:05 成人组冠亚军决赛。门禁密码 <b>5026</b>，进门后直走。</p>
+        <p>Sollentuna Fotbollshall 室内 <b>12号场</b>：12:30 合影 + 开幕式、青少年比赛（3号场）及 16:05 成人组冠亚军决赛。门禁密码 <b>5026</b>，进门后直走。</p>
         <img src="assets/indoor-map.jpg" alt="室内场地示意图" loading="lazy"></div>
 
       <div class="info"><h3>🕐 当天流程</h3><ul class="tl">
-        <li><b>12:30</b><span>球队签到，裁判及球队负责人碰头</span></li>
-        <li><b>12:45</b><span>合照 + 室外开幕式</span></li>
+        <li><b>12:30</b><span>合影 + 室内开幕式（请准时签到）</span></li>
         <li><b>13:00</b><span>成人小组赛开赛（室外）</span></li>
-        <li><b>13:15</b><span>青少年 8-11岁 7v7（室内）</span></li>
-        <li><b>14:15</b><span>青少年 12-15岁 5v5（室内）</span></li>
+        <li><b>13:15</b><span>8-11岁少儿组 7v7（室内），结束后颁奖</span></li>
+        <li><b>14:15</b><span>12-15岁青少组 7v7（室内），结束后颁奖</span></li>
         <li><b>15:35</b><span>小组赛结束，统计积分，全体移步室内</span></li>
         <li><b>16:05</b><span>成人组冠亚军决赛（室内）</span></li>
-        <li><b>17:10</b><span>颁奖 + 全体合影</span></li>
+        <li><b>16:50</b><span>决赛结束，球队集合</span></li>
+        <li><b>17:10</b><span>成人决赛颁奖 + 全体合影</span></li>
       </ul></div>
 
       <div class="info"><h3>⚽ 赛制</h3>
         <p>成人组：A、B 两组各 3 队单循环，半场比赛，20 分钟 + 5 分钟中场 + 20 分钟。手掷界外球、无越位、禁止倒地铲球、无限滚动换人、红黄牌制度。决赛打平直接点球，不加时。</p>
-        <p style="margin-top:6px">青少年：8-11岁 7v7，12-15岁 5v5，1/4 场，20 + 5 + 20 分钟。降低身体对抗，禁止危险铲球，打平直接点球。</p></div>`;
+        <p style="margin-top:6px">青少年（共 34 人）：8-11岁少儿组 7v7，12-15岁青少组 7v7，1/4 场，20 + 5 + 20 分钟。降低身体对抗，禁止危险铲球，打平直接点球。</p></div>`;
   }
 
   function renderHeader() {
