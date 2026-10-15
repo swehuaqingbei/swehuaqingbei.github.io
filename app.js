@@ -175,8 +175,13 @@
     const r = state.ranks.find(x => String(x['队伍'] || '').trim() === String(name).trim());
     return r ? colorOf(r['默认颜色'] || r['球衣颜色'] || r['颜色']) : null;
   };
+  const LOGOS = {
+    '索星一队': 'suoxing1.png', '索星二队': 'suoxing2.png', 'Kunfutball FC': 'kunfutball.png', '华夏文化': 'huaxia.png',
+  };
   const badge = (name, override) => {
     const c = colorOf(override) || teamColor(name);
+    const logo = LOGOS[String(name).trim()];
+    if (logo) return `<img class="b logo" src="assets/logos/${logo}?v=1" alt=""${c ? ` style="border-color:${c}"` : ''}>`;
     const st = c ? ` style="background:${c}"` : '';
     const lt = c && LIGHT.includes(c.toLowerCase()) ? ' lt' : '';
     const ini = initial(name);

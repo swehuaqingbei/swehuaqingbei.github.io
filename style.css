@@ -159,3 +159,5 @@ body.has-demo{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
 .ft .k{font-family:var(--serif);font-weight:700;color:var(--blue);font-size:14px}
 .ft a{font-size:13px;font-weight:700;text-decoration:none;color:var(--ink)}
 .ft .sig{font-family:"Great Vibes",cursive;font-size:20px;color:var(--muted);opacity:.45;margin-top:12px;letter-spacing:.5px}
+.b.logo{background:#fff;object-fit:contain;padding:1px;border-width:2.5px;width:40px;height:40px}
+.tbl .tn .b.logo{width:28px;height:28px;border-width:2px}
