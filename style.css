@@ -152,3 +152,10 @@ body.has-demo{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
 .card.final .bib{background:rgba(255,255,255,.15);color:#cfe0ef}
 .warn{background:#fff8e1;border:1px solid #f3d27a;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.7;color:#5b4a12}
 .warn b{color:#8a5a00}
+.b.two{font-size:11px;letter-spacing:-.5px}
+.tbl .tn .b.two{font-size:9px;letter-spacing:-.5px}
+.ft{padding:4px 16px 18px;text-align:center}
+.ft .ct{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.ft .k{font-family:var(--serif);font-weight:700;color:var(--blue);font-size:14px}
+.ft a{font-size:13px;font-weight:700;text-decoration:none;color:var(--ink)}
+.ft .sig{font-family:"Great Vibes",cursive;font-size:20px;color:var(--muted);opacity:.45;margin-top:12px;letter-spacing:.5px}

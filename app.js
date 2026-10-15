@@ -179,7 +179,8 @@
     const c = colorOf(override) || teamColor(name);
     const st = c ? ` style="background:${c}"` : '';
     const lt = c && LIGHT.includes(c.toLowerCase()) ? ' lt' : '';
-    return `<span class="b${lt}"${st}>${esc(initial(name))}</span>`;
+    const ini = initial(name);
+    return `<span class="b${lt}${ini.length > 1 ? ' two' : ''}"${st}>${esc(ini)}</span>`;
   };
 
   function teamHTML(m, side) {
