@@ -176,7 +176,7 @@
     return r ? colorOf(r['默认颜色'] || r['球衣颜色'] || r['颜色']) : null;
   };
   const LOGOS = {
-    '索星一队': 'suoxing1.png', '索星二队': 'suoxing2.png', 'Kunfutball FC': 'kunfutball.png', '华夏文化': 'huaxia.png',
+    '索星一队': 'suoxing.png', '索星二队': 'suoxing.png', 'Kunfutball FC': 'kunfutball.png', '华夏文化': 'huaxia.png',
   };
   const badge = (name, override) => {
     const c = colorOf(override) || teamColor(name);
